@@ -85,16 +85,16 @@ class Car:
         return scores
 
 
-epoch_number = 1000
+epoch_number = 10000
 eps = 0.1
 alpha = 0.5
 gamma = 0.8
 
 q_parameters = QParameters(eps, alpha, gamma)
 
-velocity = get_distribution(-0.1, 0.11, 0.01)
-position = get_distribution(0, 2.3, 0.1)
-actions = get_distribution(-1, 1.1, 0.1)
+velocity = get_distribution(-0.1, 0.11, 0.001)
+position = get_distribution(0, 2.3, 0.01)
+actions = get_distribution(-1, 1.1, 0.01)
 
 q_two_dim_func_sampling = QTwoDimFunctionSampling(position, velocity, actions)
 
