@@ -92,8 +92,8 @@ gamma = 0.8
 
 q_parameters = QParameters(eps, alpha, gamma)
 
-velocity = get_distribution(-0.7, 0.7, 0.001)
-position = get_distribution(0, 0.7, 0.01)
+velocity = get_distribution(-0.701, 0.701, 0.001)
+position = get_distribution(0, 0.51, 0.01)
 actions = get_distribution(-1, 1.01, 0.01)
 
 q_two_dim_func_sampling = QTwoDimFunctionSampling(position, velocity, actions)
