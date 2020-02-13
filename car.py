@@ -10,7 +10,7 @@ np.random.seed(0)
 
 def get_distribution(first, last, step):
     ans = []
-    while first < last:
+    while first <= last:
         ans.append(first)
         first += step
     return ans
@@ -92,9 +92,9 @@ gamma = 0.8
 
 q_parameters = QParameters(eps, alpha, gamma)
 
-velocity = get_distribution(-0.1, 0.11, 0.001)
-position = get_distribution(0, 2.3, 0.01)
-actions = get_distribution(-1, 1.1, 0.01)
+velocity = get_distribution(-0.1, 0.1, 0.001)
+position = get_distribution(0, 0.7, 0.01)
+actions = get_distribution(-1, 1.01, 0.01)
 
 q_two_dim_func_sampling = QTwoDimFunctionSampling(position, velocity, actions)
 
