@@ -6,7 +6,7 @@ If you turn on .env parameter, simulation won't stop until the car reaches the f
 
 ![learning results with env](learning_results_with_env)
 
-Here is an example of learning outcomes without .env parameter (last epoch finish position is ~0.45, so car reaches finich flag):
+Here is an example of learning outcomes without .env parameter (last epoch finish position is ~0.45, so car reaches flag):
 
 ![learning results](learning_results)
 
