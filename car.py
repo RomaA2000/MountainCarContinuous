@@ -28,7 +28,7 @@ class QTwoDimFunctionSampling:
         self.first_dim = first
         self.second_dim = second
         self.actions = acts
-        self.q_function = np.zeros([len(self.first_dim), len(self.second_dim), len(self.actions)])
+        self.q_function = np.zeros([len(self.first_dim) + 1, len(self.second_dim) + 1, len(self.actions) + 1])
 
     def get_parameters_index(self, state):
         i = bisect_left(self.first_dim, state[0], 0, len(self.first_dim))
@@ -54,7 +54,7 @@ class Car:
         return action
 
     def max_delta(self, next_state, state, action):
-        return np.max(self.q_sampling.q_function[next_state[0], next_state[0]])\
+        return np.max(self.q_sampling.q_function[next_state[0], next_state[1]])\
                - self.q_sampling.q_function[state[0], state[1], action]
 
     def learn(self, epoch, rendering):
@@ -86,7 +86,7 @@ class Car:
 
 
 epoch_number = 10000
-eps = 0.1
+eps = 0.2
 alpha = 0.5
 gamma = 0.8
 
@@ -98,7 +98,7 @@ actions = get_distribution(-1, 1.1, 0.01)
 
 q_two_dim_func_sampling = QTwoDimFunctionSampling(position, velocity, actions)
 
-env = gym.make('MountainCarContinuous-v0')
+env = gym.make('MountainCarContinuous-v0').env
 
 car = Car(q_parameters, q_two_dim_func_sampling, env)
 
@@ -112,4 +112,8 @@ import matplotlib.pyplot as plt
 plt.plot(scores)
 plt.ylabel('score')
 plt.xlabel('epoch')
+plt.show()
+plt.ylim(50, 100)
+plt.xlim(0, 10000)
+plt.plot(scores)
 plt.show()
