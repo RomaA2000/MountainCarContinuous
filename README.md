@@ -2,7 +2,7 @@
 I divided the continuous set of values into a discrete grid, and applied the standard RL algorithm with a Q-function.
 Then I trained the model by 1000 epochs and got a 92 mean score, but a mean result above 80 is already achieved by 100.
 
-If you turn on .env parameter, simulation won't stop until the car reaches the finish flag, and because of this first results will be ~-15000, but mean at all training will also be ~92.
+If you turn on .env parameter, simulation won't stop until the car reaches the finish flag, and because of this first results will be ~-1500, but mean at all training will also be ~92.
 
 ![learning results with env](plots/learning_results_with_env)
 
