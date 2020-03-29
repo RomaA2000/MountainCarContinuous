@@ -3,7 +3,7 @@ import gym
 import numpy as np
 from bisect import bisect_left
 import statistics
-
+import make_plot
 random.seed(0)
 np.random.seed(0)
 
@@ -28,16 +28,12 @@ class QTwoDimFunctionSampling:
         self.first_dim = first
         self.second_dim = second
         self.actions = acts
-        self.q_function = np.zeros([len(self.first_dim) + 1, len(self.second_dim) + 1, len(self.actions) + 1])
+        self.q_function = np.zeros([len(self.first_dim) + 1, len(self.second_dim) + 1, self.actions])
 
     def get_parameters_index(self, state):
         i = bisect_left(self.first_dim, state[0], 0, len(self.first_dim))
         j = bisect_left(self.second_dim, state[1], 0, len(self.second_dim))
         return i, j
-
-    def get_action_index(self, action):
-        return bisect_left(self.actions, action, 0, len(self.actions))
-
 
 class Car:
     def __init__(self, parameters, sampling, environment):
@@ -48,7 +44,7 @@ class Car:
 
     def get_action(self, state):
         if self.q_parameters.eps > random.uniform(0, 1):
-            action = self.q_sampling.get_action_index(self.env.action_space.sample())
+            action = self.env.action_space.sample()
         else:
             action = np.argmax(self.q_sampling.q_function[state[0], state[1]])
         return action
@@ -71,8 +67,8 @@ class Car:
                     self.env.render()
 
                 action = self.get_action(state)
-                next_obs, reward, flag, information = self.env.step([self.q_sampling.actions[action]])
-                new_reward = reward + 100 * self.q_parameters.gamma * (abs(next_obs[1]) - abs(obs[1]))
+                next_obs, reward, flag, information = self.env.step(action)
+                new_reward = reward + 100 * (abs(next_obs[1]) - abs(obs[1]))
                 next_state = self.q_sampling.get_parameters_index(next_obs)
                 s_f, s_s = state
                 delta = new_reward + self.q_parameters.gamma * self.max_delta(next_state, state, action)
@@ -86,36 +82,21 @@ class Car:
 
 
 epoch_number = 10000
-eps = 0.2
-alpha = 0.5
+eps = 0.01
+alpha = 0.4
 gamma = 0.8
 
 q_parameters = QParameters(eps, alpha, gamma)
 
-velocity = get_distribution(-0.701, 0.701, 0.001)
-position = get_distribution(0, 0.51, 0.01)
-actions = get_distribution(-1, 1.01, 0.01)
+velocity = get_distribution(-0.701, 0.701, 0.01)
+position = get_distribution(-1, 0.7, 0.1)
 
-q_two_dim_func_sampling = QTwoDimFunctionSampling(position, velocity, actions)
+q_two_dim_func_sampling = QTwoDimFunctionSampling(position, velocity, 3)
 
-env = gym.make('MountainCarContinuous-v0').env
+env = gym.make('MountainCar-v0')
 
 car = Car(q_parameters, q_two_dim_func_sampling, env)
 
 scores = car.learn(epoch_number, False)
 
-print("mean score", statistics.mean(scores))
-print("max score", max(scores))
-
-import matplotlib.pyplot as plt
-
-plt.plot(scores)
-plt.ylabel('score')
-plt.xlabel('epoch')
-plt.show()
-plt.ylim(50, 100)
-plt.xlim(0, epoch_number)
-plt.ylabel('score')
-plt.xlabel('epoch')
-plt.plot(scores)
-plt.show()
+make_plot.make_plot(scores, epoch_number)
