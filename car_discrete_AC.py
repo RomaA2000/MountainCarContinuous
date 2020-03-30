@@ -11,29 +11,32 @@ import make_plot
 random.seed(0)
 np.random.seed(0)
 
+
 def advantage_norm(A):
     std = 1e-4 + A.std() if len(A) > 0 else 1
     adv = (A - A.mean()) / std
     return adv
 
+
 def entropyLoss(prob):
     return (prob * torch.log(prob)).sum(1).mean()
 
 
-def compute_returns(next_value, rewards, gamma=0.9):
+def compute_returns(next_value, rewards, gamma=0.9999):
     r = next_value
-    returns = deque()
+    returns = []
     for step in reversed(range(len(rewards))):
         r = rewards[step] + gamma * r
-        returns.appendleft(r)
-    return list(returns)
+        returns.append(r)
+    returns.reverse()
+    return returns
 
-size = 4
 
 def make_sequence(input_size, output_size):
+    size = 16
     return nn.Sequential(
         nn.Linear(input_size, size),
-        nn.ReLU(),
+        nn.Tanh(),
         nn.Linear(size, size),
         nn.Tanh(),
         nn.Linear(size, output_size))
@@ -72,8 +75,7 @@ critic = Critic(2).to(device)
 optimizerA = optim.Adam(actor.parameters())
 optimizerC = optim.Adam(critic.parameters())
 
-
-n_iters = 100
+n_iters = 10000
 
 scores = []
 for iter in range(n_iters):
@@ -85,13 +87,13 @@ for iter in range(n_iters):
     rewards = []
     i = 0
     while True:
-        #env.render()
+        # env.render()
         state = torch.FloatTensor(state)
         prob, dist = actor(state)
         value = critic(state)
         action = dist.sample()
         next_state, reward, done, _ = env.step(action.item())
-        new_reward = reward + 100 * (abs(next_state[1])-abs(state[1]))
+        new_reward = reward + 100 * (abs(next_state[1]) - abs(state[1]))
         log_prob = dist.log_prob(action).unsqueeze(0)
         probs.append(dist.probs.unsqueeze(0))
         log_probs.append(log_prob)
@@ -116,12 +118,14 @@ for iter in range(n_iters):
     values = torch.cat(values)
     advantage = advantage_norm(returns - values)
     actor_loss = -(log_probs * advantage.detach()).mean()
-    actor_loss += entropy * 0.1
+    actor_loss += entropy * 0.001
     critic_loss = advantage.pow(2).mean()
     optimizerA.zero_grad()
     optimizerC.zero_grad()
     actor_loss.backward()
     critic_loss.backward()
+    torch.nn.utils.clip_grad_norm_(actor.parameters(), 0.5)
+    torch.nn.utils.clip_grad_norm_(critic.parameters(), 0.5)
     optimizerA.step()
     optimizerC.step()
     scores.append(torch.tensor(rewards).sum().item())
