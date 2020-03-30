@@ -1,6 +1,9 @@
 # MountainCar
 The same sampling algorithm as used for continuous version (max ~-85):
-![learning results with env](plots_discrete/sampling_10000)
+![sampling](plots_discrete/sampling_10000)
+
+The Actor-Critic algorithm is too complicated for this task, as it gets smaller results, using to learn much more time (max ~-95)
+![actor-critic](plots_discrete/actor_critic_10000)
 
 # MountainCarContinuous
 I divided the continuous set of values into a discrete grid, and applied the standard RL algorithm with a Q-function.
